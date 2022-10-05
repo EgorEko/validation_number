@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'pages/home_page.dart';
+import 'utils/colors.dart';
 
 class ValidationPoneApp extends StatelessWidget {
   const ValidationPoneApp({super.key});
@@ -8,11 +9,11 @@ class ValidationPoneApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: backgroundColor,
+        fontFamily: 'Inter',
       ),
-      home: const HomePage(title: 'Flutter Demo Home Page'),
+      home: const HomePage(),
     );
   }
 }
