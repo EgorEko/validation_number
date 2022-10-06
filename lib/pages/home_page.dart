@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../cubit/validation_cubit/validation_cubit_cubit.dart';
 import '../utils/colors.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   final TextEditingController _numberController = TextEditingController();
+
+  final String initialCountry = 'US';
+
+  PhoneNumber number = PhoneNumber(isoCode: 'US');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,136 +48,45 @@ class _HomePageState extends State<HomePage> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 280, left: 20, right: 20),
-            child: Row(
-              children: [
-                SizedBox(
-                  height: 48,
-                  width: 71,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                      ),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        fieldsBackgroundColor,
-                      ),
-                    ),
-                    onPressed: () {},
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.network(
-                            height: 20,
-                            width: 28,
-                            'https://media.istockphoto.com/photos/united-states-of-america-national-fabric-flag-textile-background-of-picture-id1174981237?k=20&m=1174981237&s=612x612&w=0&h=FIUIiqlm9ttScAfBCZJKTxJyTfgHQYk2sG7g_46_8dk=',
-                          ),
-                        ),
-                        const Text(
-                          '+1',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 16,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                SizedBox(
-                  height: 48,
-                  width: 256,
-                  child: BlocBuilder<ValidationCubit, ValidationState>(
-                    builder: (context, state) {
-                      if (state is ValidationStateInitial) {
-                        return TextField(
-                          controller: _numberController,
-                          autofocus: true,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp('[0-9]'))
-                          ],
-                          keyboardType: TextInputType.phone,
-                          decoration: InputDecoration(
-                            hintText: '(123) 123-1234',
-                            filled: true,
-                            fillColor: fieldsBackgroundColor,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                          ),
-                          onChanged: ((value) => context
-                              .read<ValidationCubit>()
-                              .validatePhoneNumber(value)),
-                        );
-                      }
-                      if (state is ValidationStateInProcess) {
-                        return TextField(
-                          controller: _numberController,
-                          autofocus: true,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp('[0-9]'))
-                          ],
-                          keyboardType: TextInputType.phone,
-                          decoration: InputDecoration(
-                            hintText: '(123) 123-1234',
-                            filled: true,
-                            fillColor: fieldsBackgroundColor,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                          ),
-                          onChanged: ((value) => context
-                              .read<ValidationCubit>()
-                              .validatePhoneNumber(value)),
-                        );
-                      }
-                      if (state is ValidationStateSucceeded) {
-                        return TextField(
-                          controller: _numberController,
-                          autofocus: true,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp('[0-9]'))
-                          ],
-                          keyboardType: TextInputType.phone,
-                          decoration: InputDecoration(
-                            hintText: '(123) 123-1234',
-                            filled: true,
-                            fillColor: fieldsBackgroundColor,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                          ),
-                          onChanged: ((value) => context
-                              .read<ValidationCubit>()
-                              .validatePhoneNumber(value)),
-                        );
-                      }
-                      return const CircularProgressIndicator();
+            child: Form(
+              key: formKey,
+              child: BlocBuilder<ValidationCubit, ValidationState>(
+                builder: (context, state) {
+                  return InternationalPhoneNumberInput(
+                    onInputChanged: (PhoneNumber number) {
+                      print(number.phoneNumber);
                     },
-                  ),
-                ),
-              ],
+                    inputDecoration: InputDecoration(
+                      fillColor: fieldsBackgroundColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    selectorConfig: const SelectorConfig(
+                      selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                    ),
+                    ignoreBlank: false,
+                    hintText: '(123)123-1234',
+                    autoValidateMode: AutovalidateMode.disabled,
+                    textStyle: const TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                    ),
+                    initialValue: number,
+                    textFieldController: _numberController,
+                    formatInput: true,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      signed: true,
+                      decimal: true,
+                    ),
+                    inputBorder: const OutlineInputBorder(),
+                  );
+                },
+              ),
             ),
-          )
+          ),
         ],
       ),
       floatingActionButton:
@@ -196,5 +113,22 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  void getPhoneNumber(String phoneNumber) async {
+    String phoneNumber = '+1(123)123-1234';
+    PhoneNumber number =
+        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
+    String parsableNumber = number.parseNumber();
+
+    setState(() {
+      this.number = number;
+    });
+  }
+
+  @override
+  void dispose() {
+    _numberController.dispose();
+    super.dispose();
   }
 }
