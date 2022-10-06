@@ -1,25 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../cubit/validation_cubit/validation_cubit_cubit.dart';
 import '../utils/colors.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  final TextEditingController _numberController = TextEditingController();
-
-  final String initialCountry = 'US';
-
-  PhoneNumber number = PhoneNumber(isoCode: 'US');
 
   @override
   Widget build(BuildContext context) {
@@ -47,61 +34,99 @@ class _HomePageState extends State<HomePage> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 280, left: 20, right: 20),
-            child: Form(
-              key: formKey,
-              child: BlocBuilder<ValidationCubit, ValidationState>(
-                builder: (context, state) {
-                  return InternationalPhoneNumberInput(
-                    onInputChanged: (PhoneNumber number) {
-                      print(number.phoneNumber);
-                    },
-                    inputDecoration: InputDecoration(
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 48,
+                  width: 71,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                      ),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        fieldsBackgroundColor,
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network(
+                            height: 20,
+                            width: 28,
+                            'https://media.istockphoto.com/photos/united-states-of-america-national-fabric-flag-textile-background-of-picture-id1174981237?k=20&m=1174981237&s=612x612&w=0&h=FIUIiqlm9ttScAfBCZJKTxJyTfgHQYk2sG7g_46_8dk=',
+                          ),
+                        ),
+                        const Text(
+                          '+1',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                SizedBox(
+                  height: 48,
+                  width: 256,
+                  child: TextField(
+                    onChanged: context.read<ValidationCubit>().activateFAB,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      LengthLimitingTextInputFormatter(10),
+                      TextInputFormatter.withFunction(
+                        (oldValue, newValue) => _UsNumberTextInputFormatter()
+                            .formatEditUpdate(oldValue, newValue),
+                      )
+                    ],
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      hintText: '(123) 123-1234',
+                      filled: true,
                       fillColor: fieldsBackgroundColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          width: 0,
+                          style: BorderStyle.none,
+                        ),
                       ),
                     ),
-                    selectorConfig: const SelectorConfig(
-                      selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-                    ),
-                    ignoreBlank: false,
-                    hintText: '(123)123-1234',
-                    autoValidateMode: AutovalidateMode.disabled,
-                    textStyle: const TextStyle(
-                      color: textColor,
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                    ),
-                    initialValue: number,
-                    textFieldController: _numberController,
-                    formatInput: true,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      signed: true,
-                      decimal: true,
-                    ),
-                    inputBorder: const OutlineInputBorder(),
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
-          ),
+          )
         ],
       ),
       floatingActionButton:
           BlocSelector<ValidationCubit, ValidationState, bool>(
         selector: (state) {
-          return state is ValidationStateSucceeded;
+          if (state is ValidationStateSucceeded) {
+            return true;
+          }
+          return false;
         },
         builder: (context, state) {
           return FloatingActionButton(
-            backgroundColor: fabActiveColor,
+            backgroundColor: state ? fabActiveColor : fabNotActiveColor,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16.0)),
             ),
             onPressed: state
                 ? () {
-                    print('active');
+                    debugPrint('button is active');
                   }
                 : null,
             child: const Icon(
@@ -113,21 +138,41 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
 
-  void getPhoneNumber(String phoneNumber) async {
-    String phoneNumber = '+1(123)123-1234';
-    PhoneNumber number =
-        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
-    String parsableNumber = number.parseNumber();
-
-    setState(() {
-      this.number = number;
-    });
-  }
-
+class _UsNumberTextInputFormatter extends TextInputFormatter {
   @override
-  void dispose() {
-    _numberController.dispose();
-    super.dispose();
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final int newTextLength = newValue.text.length;
+    int selectionIndex = newValue.selection.end;
+    int usedSubstringIndex = 0;
+    final StringBuffer newText = StringBuffer();
+    if (newTextLength >= 1) {
+      newText.write('(');
+      if (newValue.selection.end >= 1) selectionIndex++;
+    }
+    if (newTextLength >= 4) {
+      newText.write('${newValue.text.substring(0, usedSubstringIndex = 3)}) ');
+      if (newValue.selection.end >= 3) selectionIndex += 2;
+    }
+    if (newTextLength >= 7) {
+      newText.write('${newValue.text.substring(3, usedSubstringIndex = 6)}-');
+      if (newValue.selection.end >= 6) selectionIndex++;
+    }
+    if (newTextLength >= 11) {
+      newText.write('${newValue.text.substring(6, usedSubstringIndex = 10)} ');
+      if (newValue.selection.end >= 10) selectionIndex++;
+    }
+    // Dump the rest.
+    if (newTextLength >= usedSubstringIndex) {
+      newText.write(newValue.text.substring(usedSubstringIndex));
+    }
+    return TextEditingValue(
+      text: newText.toString(),
+      selection: TextSelection.collapsed(offset: selectionIndex),
+    );
   }
 }
