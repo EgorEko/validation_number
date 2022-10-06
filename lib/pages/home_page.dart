@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../cubit/validation_cubit/validation_cubit_cubit.dart';
 import '../utils/colors.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final TextEditingController _numberController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,23 +86,85 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: 48,
                   width: 256,
-                  child: TextField(
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp('[0-9]'))
-                    ],
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      hintText: '(123) 123-1234',
-                      filled: true,
-                      fillColor: fieldsBackgroundColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                          width: 0,
-                          style: BorderStyle.none,
-                        ),
-                      ),
-                    ),
+                  child: BlocBuilder<ValidationCubit, ValidationState>(
+                    builder: (context, state) {
+                      if (state is ValidationStateInitial) {
+                        return TextField(
+                          controller: _numberController,
+                          autofocus: true,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp('[0-9]'))
+                          ],
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: '(123) 123-1234',
+                            filled: true,
+                            fillColor: fieldsBackgroundColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                            ),
+                          ),
+                          onChanged: ((value) => context
+                              .read<ValidationCubit>()
+                              .validatePhoneNumber(value)),
+                        );
+                      }
+                      if (state is ValidationStateInProcess) {
+                        return TextField(
+                          controller: _numberController,
+                          autofocus: true,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp('[0-9]'))
+                          ],
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: '(123) 123-1234',
+                            filled: true,
+                            fillColor: fieldsBackgroundColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                            ),
+                          ),
+                          onChanged: ((value) => context
+                              .read<ValidationCubit>()
+                              .validatePhoneNumber(value)),
+                        );
+                      }
+                      if (state is ValidationStateSucceeded) {
+                        return TextField(
+                          controller: _numberController,
+                          autofocus: true,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp('[0-9]'))
+                          ],
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: '(123) 123-1234',
+                            filled: true,
+                            fillColor: fieldsBackgroundColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                            ),
+                          ),
+                          onChanged: ((value) => context
+                              .read<ValidationCubit>()
+                              .validatePhoneNumber(value)),
+                        );
+                      }
+                      return const CircularProgressIndicator();
+                    },
                   ),
                 ),
               ],
@@ -102,16 +172,28 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: fabActiveColor,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16.0)),
-        ),
-        onPressed: () {},
-        child: const Icon(
-          Icons.arrow_forward,
-          color: textColor,
-        ),
+      floatingActionButton:
+          BlocSelector<ValidationCubit, ValidationState, bool>(
+        selector: (state) {
+          return state is ValidationStateSucceeded;
+        },
+        builder: (context, state) {
+          return FloatingActionButton(
+            backgroundColor: fabActiveColor,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16.0)),
+            ),
+            onPressed: state
+                ? () {
+                    print('active');
+                  }
+                : null,
+            child: const Icon(
+              Icons.arrow_forward,
+              color: textColor,
+            ),
+          );
+        },
       ),
     );
   }
