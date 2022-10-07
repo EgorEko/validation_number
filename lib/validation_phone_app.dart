@@ -7,6 +7,7 @@ import 'utils/colors.dart';
 
 class ValidationPhoneApp extends StatelessWidget {
   final String initialRoute;
+
   const ValidationPhoneApp({super.key, required this.initialRoute});
 
   @override
