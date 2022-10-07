@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'api_cubit.dart';
 
 abstract class ApiState extends Equatable {
@@ -13,7 +12,7 @@ class ApiStateInitial extends ApiState {}
 class ApiStateWaiting extends ApiState {}
 
 class ApiStateSucceed extends ApiState {
-  final List<CountriesDTO> countries;
+  final List<CountryModel> countries;
 
   const ApiStateSucceed(this.countries);
 

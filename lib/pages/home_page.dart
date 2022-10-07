@@ -13,11 +13,24 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: <Widget>[
-          const BarWidget(),
           Padding(
-            padding: const EdgeInsets.only(top: 280, left: 20, right: 20),
+            padding: const EdgeInsets.only(top: 80, left: 20),
+            child: Row(
+              children: [
+                ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(minWidth: 344, minHeight: 40),
+                  child: const BarWidget(
+                    text: 'Get Started',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 160, left: 20, right: 20),
             child: Row(
               children: [
                 SizedBox(
@@ -36,6 +49,7 @@ class HomePage extends StatelessWidget {
                     ),
                     onPressed: () {
                       showModalBottomSheet(
+                        backgroundColor: backgroundColor,
                         context: context,
                         builder: (context) {
                           return const CountriesPage();
