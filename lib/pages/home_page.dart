@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/validation_cubit/validation_cubit_cubit.dart';
 import '../utils/colors.dart';
+import 'countries_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -50,7 +51,14 @@ class HomePage extends StatelessWidget {
                         fieldsBackgroundColor,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return const CountriesPage();
+                        },
+                      );
+                    },
                     child: Row(
                       children: [
                         ClipRRect(

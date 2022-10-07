@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'navigation/app_routs_name.dart';
 import 'pages/home_page.dart';
 import 'utils/colors.dart';
 
-class ValidationPoneApp extends StatelessWidget {
-  const ValidationPoneApp({super.key});
+class ValidationPhoneApp extends StatelessWidget {
+  final String initialRoute;
+  const ValidationPhoneApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,24 @@ class ValidationPoneApp extends StatelessWidget {
         scaffoldBackgroundColor: backgroundColor,
         fontFamily: 'Inter',
       ),
-      home: const HomePage(),
+      initialRoute: initialRoute,
+      onGenerateRoute: (settings) {
+        /* if (settings.name == countriesRouteName) {
+          return MaterialPageRoute(
+            builder: (context) => 
+
+
+            );
+          
+        }*/
+        return MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        );
+      },
+      /*routes: {
+        '/countries': (BuildContext context) => 
+
+      },*/
     );
   }
 }
