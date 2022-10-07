@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'navigation/app_routs_name.dart';
+import 'pages/countries_page.dart';
 import 'pages/home_page.dart';
 import 'utils/colors.dart';
 
@@ -17,22 +18,14 @@ class ValidationPhoneApp extends StatelessWidget {
       ),
       initialRoute: initialRoute,
       onGenerateRoute: (settings) {
-        /* if (settings.name == countriesRouteName) {
-          return MaterialPageRoute(
-            builder: (context) => 
-
-
-            );
-          
-        }*/
+        if (settings.name == countriesRouteName) {
+          return MaterialPageRoute(builder: (context) => const CountriesPage());
+        }
         return MaterialPageRoute(
           builder: (context) => const HomePage(),
         );
       },
-      /*routes: {
-        '/countries': (BuildContext context) => 
-
-      },*/
+      routes: {'/countries': (BuildContext context) => const CountriesPage()},
     );
   }
 }
