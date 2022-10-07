@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../cubit/api_cubit/api_cubit.dart';
+import '../cubit/load_cubit/load_cubit.dart';
 import '../utils/colors.dart';
 import '../widgets/bar_widget.dart';
 
@@ -29,7 +29,11 @@ class CountriesPage extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.close)),
+              IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.close)),
               const SizedBox(
                 width: 20,
               )
@@ -58,36 +62,59 @@ class CountriesPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: BlocBuilder<ApiCubit, ApiState>(
-              builder: (context, state) {
-                if (state is ApiStateInitial) {
-                  context.read<ApiCubit>().load();
-                } else if (state is ApiStateSucceed) {
-                  final items = state.countries;
-                  return ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final item = items[index];
-                      return Card(
-                        child: ListTile(
-                          tileColor: backgroundColor,
-                          title: Text(
-                            item.root,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: BlocBuilder<LoadCubit, LoadState>(
+                builder: (context, state) {
+                  if (state is LoadStateSucceed) {
+                    final items = state.countries;
+                    return ListView.builder(
+                      itemCount: items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final item = items[index];
+                        return Card(
+                          child: ListTile(
+                            onTap: () {},
+                            tileColor: backgroundColor,
+                            title: Row(
+                              children: [
+                                Text(
+                                  item.root,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    color: textColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 12,
+                                ),
+                                Text(
+                                  item.name,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    color: headerColor,
+                                    fontSize: 16,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                          subtitle: Text(
-                            item.name,
-                          ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    );
+                  } else if (state is LoadStateFailed) {
+                    return Center(child: Text(state.error));
+                  } else if (state is LoadStateWaiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return const Center(
+                    child: Text('No country has been loaded'),
                   );
-                } else if (state is ApiStateFailed) {
-                  return Center(child: Text(state.error));
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
+                },
+              ),
             ),
           ),
         ],
