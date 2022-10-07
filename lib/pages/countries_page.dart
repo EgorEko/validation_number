@@ -30,10 +30,11 @@ class CountriesPage extends StatelessWidget {
               ),
               const Spacer(),
               IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.close)),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.close),
+              ),
               const SizedBox(
                 width: 20,
               )
@@ -45,8 +46,14 @@ class CountriesPage extends StatelessWidget {
             child: SizedBox(
               height: 48,
               child: TextField(
+                onChanged: (value) => context.read<LoadCubit>().search(value),
                 decoration: InputDecoration(
-                  prefix: const Icon(Icons.search_outlined),
+                  prefix: IconButton(
+                    onPressed: () async {
+                      await context.read<LoadCubit>().searchClear();
+                    },
+                    icon: const Icon(Icons.search_outlined),
+                  ),
                   hintText: 'Search',
                   filled: true,
                   fillColor: fieldsBackgroundColor,
@@ -66,7 +73,50 @@ class CountriesPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: BlocBuilder<LoadCubit, LoadState>(
                 builder: (context, state) {
-                  if (state is LoadStateSucceed) {
+                  if (state is LoadStateSearchFounded) {
+                    final items = state.countryModel;
+                    return ListView.builder(
+                      itemCount: items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final item = items[index];
+                        return Card(
+                          child: ListTile(
+                            onTap: () {},
+                            tileColor: backgroundColor,
+                            title: Row(
+                              children: [
+                                Image.network(
+                                  item.flag,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  item.root,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    color: textColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 12,
+                                ),
+                                Text(
+                                  item.name,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    color: headerColor,
+                                    fontSize: 16,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else if (state is LoadStateSucceed) {
                     final items = state.countries;
                     return ListView.builder(
                       itemCount: items.length,
