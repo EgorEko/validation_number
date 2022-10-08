@@ -30,9 +30,18 @@ class LoadStateFailed extends LoadState {
 }
 
 class LoadStateSearchUninitialized extends LoadState {
-  final List<CountryModel> countryModel;
+  final List<CountryModel> countriesModel;
 
-  const LoadStateSearchUninitialized(this.countryModel);
+  const LoadStateSearchUninitialized(this.countriesModel);
+
+  @override
+  List<Object?> get props => [countriesModel];
+}
+
+class LoadStateFixedCountry extends LoadState {
+  final CountryModel countryModel;
+
+  const LoadStateFixedCountry(this.countryModel);
 
   @override
   List<Object?> get props => [countryModel];

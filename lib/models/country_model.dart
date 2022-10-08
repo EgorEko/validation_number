@@ -7,7 +7,13 @@ class CountryModel {
   final String root;
   final List<dynamic> suffixes;
 
-  CountryModel._(this.name, this.code, this.flag, this.root, this.suffixes);
+  CountryModel._(
+    this.name,
+    this.code,
+    this.flag,
+    this.root,
+    this.suffixes,
+  );
 
   factory CountryModel.fromCountriesDTO(CountriesDTO countriesDTO) {
     return CountryModel._(

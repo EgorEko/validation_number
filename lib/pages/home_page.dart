@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
+import '../cubit/load_cubit/load_cubit.dart';
 import '../cubit/validation_cubit/validation_cubit_cubit.dart';
 import '../utils/colors.dart';
 import '../widgets/bar_widget.dart';
@@ -56,26 +58,36 @@ class HomePage extends StatelessWidget {
                         },
                       );
                     },
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.network(
-                            height: 20,
-                            width: 28,
-                            'https://media.istockphoto.com/photos/united-states-of-america-national-fabric-flag-textile-background-of-picture-id1174981237?k=20&m=1174981237&s=612x612&w=0&h=FIUIiqlm9ttScAfBCZJKTxJyTfgHQYk2sG7g_46_8dk=',
-                          ),
-                        ),
-                        const Text(
-                          '+1',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 16,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                    child: BlocBuilder<LoadCubit, LoadState>(
+                      builder: (context, state) {
+                        String flag = 'https://flagcdn.com/us.svg';
+                        String root = '+1';
+                        if (state is LoadStateFixedCountry) {
+                          flag = state.countryModel.flag;
+                          root = state.countryModel.root;
+                        }
+
+                        return Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: SvgPicture.network(
+                                flag,
+                                width: 32,
+                              ),
+                            ),
+                            Text(
+                              root,
+                              style: const TextStyle(
+                                color: textColor,
+                                fontSize: 16,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),

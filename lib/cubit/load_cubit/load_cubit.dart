@@ -24,7 +24,18 @@ class LoadCubit extends Cubit<LoadState> {
       if (state is LoadStateInitial) {
         emit(LoadStateWaiting());
         List<CountryModel> countries = await _apiService.getCountries();
+
         emit(LoadStateSucceed(countries));
+      }
+    } catch (e) {
+      emit(LoadStateFailed(e.toString()));
+    }
+  }
+
+  Future<void> fixCountry(CountryModel item) async {
+    try {
+      if (state is LoadStateSucceed || state is LoadStateSearchFounded) {
+        emit(LoadStateFixedCountry(item));
       }
     } catch (e) {
       emit(LoadStateFailed(e.toString()));
@@ -77,14 +88,20 @@ class LoadCubit extends Cubit<LoadState> {
     }
 
     if (_isNumeric(term)) {
-      final foundedItems = countryModel
-          .where((element) => element.root.startsWith(term))
-          .toList();
-      return foundedItems;
+      if (term.length < 3) {
+        return countryModel
+            .where((element) => element.root.startsWith(term))
+            .toList();
+      }
+
+      return <CountryModel>[];
     }
 
-    final foundedItems =
-        countryModel.where((element) => element.name.startsWith(term)).toList();
+    final foundedItems = countryModel.where((element) {
+      final termFormatted = '${term[0].toUpperCase()}${term.substring(1)}';
+
+      return element.name.startsWith(termFormatted);
+    }).toList();
     return foundedItems;
   }
 
