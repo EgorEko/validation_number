@@ -24,7 +24,6 @@ class LoadCubit extends Cubit<LoadState> {
       if (state is LoadStateInitial) {
         emit(LoadStateWaiting());
         List<CountryModel> countries = await _apiService.getCountries();
-        print(countries.length);
 
         emit(LoadStateSucceed(countries));
       }
