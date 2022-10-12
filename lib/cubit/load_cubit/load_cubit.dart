@@ -24,12 +24,17 @@ class LoadCubit extends Cubit<LoadState> {
       if (state is LoadStateInitial) {
         emit(LoadStateWaiting());
         List<CountryModel> countries = await _apiService.getCountries();
+        print(countries.length);
 
         emit(LoadStateSucceed(countries));
       }
     } catch (e) {
       emit(LoadStateFailed(e.toString()));
     }
+  }
+
+  Future<void> clearHistory() async {
+    emit(LoadStateInitial());
   }
 
   Future<void> fixCountry(CountryModel item) async {

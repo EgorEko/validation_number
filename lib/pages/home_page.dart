@@ -38,57 +38,66 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: 48,
                   width: 71,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
+                  child: BlocBuilder<LoadCubit, LoadState>(
+                    builder: (context, state) {
+                      return TextButton(
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                          ),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            fieldsBackgroundColor,
+                          ),
                         ),
-                      ),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        fieldsBackgroundColor,
-                      ),
-                    ),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        backgroundColor: backgroundColor,
-                        context: context,
-                        builder: (context) {
-                          return const CountriesPage();
+                        onPressed: () {
+                          showModalBottomSheet(
+                            backgroundColor: backgroundColor,
+                            context: context,
+                            builder: (context) {
+                              if (state is LoadStateInitial) {
+                                return const CountriesPage();
+                              }
+                              context.read<LoadCubit>().clearHistory();
+                              return const CountriesPage();
+                            },
+                          );
                         },
+                        child: BlocBuilder<LoadCubit, LoadState>(
+                          builder: (context, state) {
+                            String flag = 'https://flagcdn.com/us.svg';
+                            String root = '+1';
+                            if (state is LoadStateFixedCountry) {
+                              flag = state.countryModel.flag;
+                              root = state.countryModel.root;
+                            }
+
+                            return Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: SvgPicture.network(
+                                    flag,
+                                    width: 32,
+                                  ),
+                                ),
+                                Text(
+                                  root,
+                                  style: const TextStyle(
+                                    color: textColor,
+                                    fontSize: 16,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                       );
                     },
-                    child: BlocBuilder<LoadCubit, LoadState>(
-                      builder: (context, state) {
-                        String flag = 'https://flagcdn.com/us.svg';
-                        String root = '+1';
-                        if (state is LoadStateFixedCountry) {
-                          flag = state.countryModel.flag;
-                          root = state.countryModel.root;
-                        }
-
-                        return Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: SvgPicture.network(
-                                flag,
-                                width: 32,
-                              ),
-                            ),
-                            Text(
-                              root,
-                              style: const TextStyle(
-                                color: textColor,
-                                fontSize: 16,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
                   ),
                 ),
                 const SizedBox(

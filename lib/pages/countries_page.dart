@@ -97,8 +97,12 @@ class _CountriesPageState extends State<CountriesPage> {
                     final items = state.countries;
                     return ListView.builder(
                       itemCount: items.length,
+                      prototypeItem: ListTile(
+                        title: Text(items.first.name),
+                      ),
                       itemBuilder: (BuildContext context, int index) {
                         final item = items[index];
+
                         return ListTilePoint(countryModel: item);
                       },
                     );
