@@ -14,6 +14,7 @@ class ListTilePoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final leading = SvgPicture.network(countryModel.flag);
+
     final title = Text(
       '${countryModel.root} ${countryModel.suffixes[0]} ${countryModel.name}',
       style: const TextStyle(
