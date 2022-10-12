@@ -11,11 +11,15 @@ class CountriesDTO {
       json['name'],
       json['ccn3'] ?? '',
       json['flags'] ?? {'svg': ''},
-      json['idd'] ??
-          {
-            'root': '',
-            'suffixes': ['']
-          },
+      json['idd'] == ''
+          ? {
+              'root': '',
+              'suffixes': ['']
+            }
+          : {
+              'root': '',
+              'suffixes': ['']
+            },
     );
   }
 }
