@@ -16,7 +16,7 @@ class CountriesDTO {
               'root': '',
               'suffixes': ['']
             }
-          : json['idd'] == {}
+          : json['idd']['root'] == null
               ? {
                   'root': '',
                   'suffixes': ['']
